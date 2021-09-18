@@ -9,35 +9,53 @@ import time
 
 driver = webdriver.Chrome('chromedriver.exe')
 
+def temp_ecoule(debut):
+
+    timeX = round(((time.clock() - debut)/60),2)
+    hours, seconds = divmod(timeX * 60, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return  "{:02.0f}:{:02.0f}:{:02.0f}".format(hours, minutes, seconds)
+
+
 urls=[]
 cond = True
 nb_page = 1
 
 #Récole des liens avec la pagination
+start_time = time.clock ()
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
+print('Récolte de liens en cour #-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 while cond :
 
     driver.get("https://www.ouedkniss.com/automobiles/"+str(nb_page))
 
     auto = driver.find_elements_by_class_name('annonce_titre')
-
+    link_count = 0
     for i in auto:
-
-        urls.append(i.find_element_by_tag_name('a').get_property('href'))
         
-    print('page '+ str(nb_page)+'  fini.....................')
+        urls.append(i.find_element_by_tag_name('a').get_property('href'))
+        link_count += 1
+        
+    print('Page N: '+ str(nb_page)+' Terminé.......... '+str(link_count)+' Liens récolté ......')
 
     nb_page+=1
 
-    if nb_page == 50:
+    if nb_page == 5:
 
         cond = False
     
-    
-print(len(urls))
+
+
+print(str(len(urls)) + ' urls en '+ str(temp_ecoule(start_time)))
 
 
 #Recuperation des informations et création du fichier csv 
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
+print('Récole d informations et écriture du fichier en cour #-#-#-#-#-#-#-#-#-#-#-#-#-#-# ')
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 with open('offres_voitures.csv','w',encoding='utf-8') as line:
+    start_time = time.perf_counter ()
 
     for ind,i in enumerate(urls):
 
@@ -47,12 +65,12 @@ with open('offres_voitures.csv','w',encoding='utf-8') as line:
 
         if img_404.find_element_by_tag_name('h1').text == "Page n'existe plus" :
 
-            print('N:'+ str(ind+1) +"lien mort ...............")
+            print('Lien N:'+ str(ind+1) +" Mort ...............")
 
             pass
 
         else:
-
+            
             try:
 
                 titre = driver.find_element_by_id('Title').text
@@ -115,17 +133,20 @@ with open('offres_voitures.csv','w',encoding='utf-8') as line:
 
                 line.write(li+'\n')
 
-                print('N:'+ str(ind+1) +' Ajouté ......')
+                print('Ligne N:'+ str(ind+1) +' Ajouté  ......')
+
+                
                 
             except:
 
                 line.write(''+'\n')
 
-                print('N:'+ str(ind+1)+' ligne ignorée .....................................')
+                print('Ligne N:'+ str(ind+1)+' Ignorée .....................................')
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
+print('Terminé en ........'+str(temp_ecoule(start_time)))
+print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 
-driver.quit()
-driver.close()
-    
+
     
     
         
