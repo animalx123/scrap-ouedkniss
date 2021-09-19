@@ -54,6 +54,7 @@ print(str(len(urls)) + ' urls en '+ str(temp_ecoule(start_time)))
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 print('Récole d informations et écriture du fichier en cour #-#-#-#-#-#-#-#-#-#-#-#-#-#-# ')
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
+nbr_line = 1
 with open('offres_voitures.csv','w') as line:
     start_time = time.perf_counter ()
 
@@ -139,6 +140,8 @@ with open('offres_voitures.csv','w') as line:
 
                 line.write(li+'\n')
 
+                nbr_line += 1
+
                 print('Ligne N:'+ str(ind+1) +' Ajouté  ......')
 
                 
@@ -148,8 +151,10 @@ with open('offres_voitures.csv','w') as line:
                 line.write(''+'\n')
 
                 print('Ligne N:'+ str(ind+1)+' Ignorée .....................................')
+
+
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
-print('Terminé en ........'+str(temp_ecoule(start_time)))
+print(str(nbr_line)+'Annonces récolté en ........'+str(temp_ecoule(start_time)))
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 
 
