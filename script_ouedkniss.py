@@ -11,7 +11,7 @@ driver = webdriver.Chrome('chromedriver.exe')
 
 def temp_ecoule(debut):
 
-    timeX = round(((time.clock() - debut)/60),2)
+    timeX = round(((time.perf_counter() - debut)/60),2)
     hours, seconds = divmod(timeX * 60, 3600)
     minutes, seconds = divmod(seconds, 60)
     return  "{:02.0f}:{:02.0f}:{:02.0f}".format(hours, minutes, seconds)
@@ -22,7 +22,7 @@ cond = True
 nb_page = 1
 
 #Récole des liens avec la pagination
-start_time = time.clock ()
+start_time = time.perf_counter()
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 print('Récolte de liens en cour #-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
@@ -41,7 +41,7 @@ while cond :
 
     nb_page+=1
 
-    if nb_page == 5:
+    if nb_page == 2:
 
         cond = False
     
@@ -54,9 +54,11 @@ print(str(len(urls)) + ' urls en '+ str(temp_ecoule(start_time)))
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 print('Récole d informations et écriture du fichier en cour #-#-#-#-#-#-#-#-#-#-#-#-#-#-# ')
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
-with open('offres_voitures.csv','w',encoding='utf-8') as line:
+nbr_line = 1
+with open('offres_voitures.csv','w') as line:
     start_time = time.perf_counter ()
 
+    line.write('Titre;Date;Heure;Email;Telephone;Adresse;Nom;Type de voiture;Moteur;Kilométrage;Couleur;Energie;Prix' +'\n')
     for ind,i in enumerate(urls):
 
         driver.get(i)
@@ -84,10 +86,14 @@ with open('offres_voitures.csv','w',encoding='utf-8') as line:
                 desc = driver.find_element_by_id('Description')
                 type_v = desc.find_element_by_id('Catégorie').text[18:]
                 moteur = desc.find_element_by_id('Moteur').text[8:] 
-                kilometre = desc.find_element_by_id('Kilométrage').text[12:] 
+                kilometre = desc.find_element_by_id('Kilométrage').text[13:] 
                 couleur = desc.find_element_by_id('Couleur').text[9:] 
                 energie = desc.find_element_by_id('Energie').text[9:] 
                 phone = driver.find_element_by_id('direct_call').find_element_by_tag_name('a').get_property('href')[4:]
+
+                date = driver.find_element_by_css_selector('#Description > p:nth-child(3) > span').text
+                date = date.replace(' ','')
+                d , h  = date.split('à')
             
             except:
 
@@ -124,14 +130,17 @@ with open('offres_voitures.csv','w',encoding='utf-8') as line:
             else:
 
                 infos_name = driver.find_element_by_id('Annonceur').find_element_by_tag_name('a').text #annonceur normal
+            
 
-            li = [titre,type_v,moteur,kilometre,couleur,energie,eprix,adresse,email,phone,infos_name]
+            li = [titre,d,h,email,phone,adresse,infos_name,type_v,moteur,kilometre,couleur,energie,eprix]
 
             li=';'.join(li)
             
             try:
 
                 line.write(li+'\n')
+
+                nbr_line += 1
 
                 print('Ligne N:'+ str(ind+1) +' Ajouté  ......')
 
@@ -142,8 +151,10 @@ with open('offres_voitures.csv','w',encoding='utf-8') as line:
                 line.write(''+'\n')
 
                 print('Ligne N:'+ str(ind+1)+' Ignorée .....................................')
+
+
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
-print('Terminé en ........'+str(temp_ecoule(start_time)))
+print(str(nbr_line)+'Annonces récolté en ........'+str(temp_ecoule(start_time)))
 print('#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#')
 
 
